@@ -1,41 +1,55 @@
 'use strict';
 
-var REQUEST_URL = 'https://raw.githubusercontent.com/facebook/react-native/master/docs/MoviesExample.json';
-
 var React = require('react-native');
 var {
     AppRegistry,
     Image,
+    ListView,
     StyleSheet,
     Text,
     View,
     } = React;
 
+var API_KEY = '7waqfqbprs7pajbz28mqf6vz';
+var API_URL = 'http://api.rottentomatoes.com/api/public/v1.0/lists/movies/in_theaters.json';
+var PAGE_SIZE = 25;
+var PARAMS = '?apikey=' + API_KEY + '&page_limit=' + PAGE_SIZE;
+var REQUEST_URL = API_URL + PARAMS;
+
 var FirstProject = React.createClass({
     getInitialState: function () {
         return {
-            movies: null
-        }
+            dataSource: new ListView.DataSource({
+                rowHasChanged: (row1, row2) => row1 !== row2,
+            }),
+            loaded: false
+        };
     },
     componentDidMount: function () {
-        this.fetchDate();
+        this.fetchData();
     },
-    fetchDate: function () {
+    fetchData: function () {
         fetch(REQUEST_URL)
-            .then((response)=>response.json())
-            .then((responseData)=> {
+            .then((response) => response.json())
+            .then((responseData) => {
                 this.setState({
-                    movies: responseData.movies
+                    dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
+                    loaded: true
                 });
             })
             .done();
     },
     render: function () {
-        if (!this.state.movies) {
+        if (!this.state.loaded) {
             return this.renderLoadingView();
         }
-        var movie = this.state.movies[0];
-        return this.renderMovie(movie);
+        return (
+            <ListView
+                dataSource={this.state.dataSource}
+                renderRow={this.renderMovie}
+                style={styles.listView}
+            />
+        );
     },
     renderLoadingView: function () {
         return (
@@ -50,16 +64,12 @@ var FirstProject = React.createClass({
         return (
             <View style={styles.container}>
                 <Image
-                    source={{uri:movie.posters.thumbnail}}
+                    source={{uri: movie.posters.thumbnail}}
                     style={styles.thumbnail}
                 />
                 <View style={styles.rightContainer}>
-                    <Text style={styles.title}>
-                        {movie.title}
-                    </Text>
-                    <Text style={styles.year}>
-                        {movie.year}
-                    </Text>
+                    <Text style={styles.title}>{movie.title}</Text>
+                    <Text style={styles.year}>{movie.year}</Text>
                 </View>
             </View>
         );
@@ -72,7 +82,8 @@ var styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F5FCFF'
+        backgroundColor: '#F5FCFF',
+        marginBottom: 4
     },
     rightContainer: {
         flex: 1
@@ -88,6 +99,9 @@ var styles = StyleSheet.create({
     thumbnail: {
         width: 53,
         height: 81
+    },
+    listView: {
+        backgroundColor: '#F5FCFF'
     }
 });
 
