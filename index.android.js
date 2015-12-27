@@ -1,12 +1,13 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
 'use strict';
+
+var MOCKED_MOVIES_DATA = [
+    {title: 'Title', year: '2015', posters: {thumbnail: 'http://i.imgur.com/UePbdph.jpg'}},
+];
 
 var React = require('react-native');
 var {
     AppRegistry,
+    Image,
     StyleSheet,
     Text,
     View,
@@ -14,17 +15,19 @@ var {
 
 var FirstProject = React.createClass({
     render: function () {
+        var movie = MOCKED_MOVIES_DATA[0];
         return (
             <View style={styles.container}>
-                <Text style={styles.welcome}>
-                    Welcome to React Native!
+                <Text>
+                    {movie.title}
                 </Text>
-                <Text style={styles.instructions}>
-                    To get started, edit index.android.js
+                <Text>
+                    {movie.year}
                 </Text>
-                <Text style={styles.instructions}>
-                    Shake or press menu button for dev menu
-                </Text>
+                <Image
+                    source={{uri:movie.posters.thumbnail}}
+                    style={styles.thumbnail}
+                />
             </View>
         );
     }
@@ -37,15 +40,9 @@ var styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F5FCFF'
     },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10
-    },
-    instructions: {
-        textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5
+    thumbnail: {
+        width: 53,
+        height: 81
     }
 });
 
